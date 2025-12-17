@@ -170,6 +170,30 @@ const allTodo = async (req, res) => {
         })
     }
 }
+const singleTodo = async (req, res) => {
+    try {
+        const todoId = req.params.id;
 
-module.exports = { create, editTodo, deleteTodo, allTodo, updateTodoStatus, filterTodo }
+        const todo = await todoModel.findOne({
+            _id: todoId,
+            userId: req.user.id, // 🔒 ownership check
+        });
+
+        if (!todo) {
+            return res.status(404).json({
+                message: "Todo not found or not authorized",
+            });
+        }
+
+        res.json({ todo });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Server Error",
+            error: error.message,
+        });
+    }
+};
+
+module.exports = { create, editTodo, deleteTodo, allTodo, updateTodoStatus, filterTodo, singleTodo }
 
