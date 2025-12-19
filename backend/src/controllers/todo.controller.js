@@ -3,7 +3,7 @@ const todoModel = require("../models/todo.model")
 
 const create = async (req, res) => {
     try {
-        const { title, description } = req.body
+        const { title, description, status } = req.body
 
         if (!title) {
             return res.status(400).json({
@@ -14,7 +14,8 @@ const create = async (req, res) => {
         const todo = await todoModel.create({
             userId: req.user.id,
             title,
-            description
+            description,
+            status: status || "pending",
         })
         res.status(201).json({
             success: true,
@@ -36,7 +37,7 @@ const create = async (req, res) => {
 const editTodo = async (req, res) => {
     try {
         const todoId = req.params.id
-        const { title, description } = req.body
+        const { title, description, status } = req.body
         const todo = await todoModel.findOne({
             _id: todoId,
             userId: req.user.id
@@ -50,7 +51,7 @@ const editTodo = async (req, res) => {
 
         if (title !== undefined) todo.title = title;
         if (description !== undefined) todo.description = description;
-
+        if (status !== undefined) todo.status = status;
         await todo.save();
 
         res.json({
